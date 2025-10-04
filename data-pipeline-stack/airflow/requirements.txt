@@ -1,0 +1,4 @@
+# Adapter để dbt có thể kết nối và chạy trên ClickHouse
+dbt-clickhouse==1.7.2
+# Thư viện cho Airflow để kết nối với PostgreSQL
+apache-airflow-providers-postgres==5.8.0

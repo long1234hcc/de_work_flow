@@ -1,0 +1,143 @@
+services:
+  dbt_clickhouse:
+    image: clickhouse/clickhouse-server:24.3-alpine
+    container_name: dbt_clickhouse
+    hostname: dbt_clickhouse
+    ports:
+      - "8123:8123"
+      - "9000:9000"
+    environment:
+      - CLICKHOUSE_USER=${CLICKHOUSE_USER}
+      - CLICKHOUSE_PASSWORD=${CLICKHOUSE_PASSWORD}
+      - CLICKHOUSE_DB=${CLICKHOUSE_DB}
+    volumes:
+      - clickhouse_data:/var/lib/clickhouse/
+    networks:
+      - data_stack_network
+    healthcheck:
+      # NOTE: healthcheck dùng curl/wget; nếu image thiếu curl/wget, healthcheck có thể fail.
+      test: ["CMD", "curl", "--fail", "http://localhost:8123/ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    ulimits:
+      nproc: 65535
+      nofile:
+        soft: 262144
+        hard: 262144
+
+  postgres:
+    image: postgres:14
+    container_name: postgres
+    environment:
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DB=${POSTGRES_DB}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - data_stack_network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  airflow-init:
+    build:
+      context: ./airflow
+      args:
+        AIRFLOW_UID: ${AIRFLOW_UID}
+        AIRFLOW_GID: ${AIRFLOW_GID}
+    container_name: airflow-init
+    depends_on:
+      - postgres
+    volumes:
+      - ./dbt_project:/opt/dbt_project
+    environment:
+      - AIRFLOW__CORE__EXECUTOR=LocalExecutor
+      - AIRFLOW__DATABASE__SQL_ALCHEMY_CONN=postgresql+psycopg2://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
+      - AIRFLOW__CORE__LOAD_EXAMPLES=false
+      - _AIRFLOW_WWW_USER_USERNAME=airflow
+      - _AIRFLOW_WWW_USER_PASSWORD=${_AIRFLOW_WWW_USER_PASSWORD}
+      - AIRFLOW_UID=${AIRFLOW_UID}
+      - AIRFLOW_GID=${AIRFLOW_GID}
+      - AIRFLOW__WEBSERVER__SECRET_KEY=${AIRFLOW_SECRET_KEY}
+      - CLICKHOUSE_USER=${CLICKHOUSE_USER}
+      - CLICKHOUSE_PASSWORD=${CLICKHOUSE_PASSWORD}
+    networks:
+      - data_stack_network
+    command: >
+      bash -c "
+        airflow db upgrade &&
+        airflow users create --role Admin --username airflow --email admin@example.com --firstname admin --lastname admin --password ${_AIRFLOW_WWW_USER_PASSWORD}
+      "
+
+  airflow-webserver:
+    build:
+      context: ./airflow
+      args:
+        AIRFLOW_UID: ${AIRFLOW_UID}
+        AIRFLOW_GID: ${AIRFLOW_GID}
+    container_name: airflow-webserver
+    restart: always
+    depends_on:
+      - airflow-init
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./airflow/dags:/opt/airflow/dags
+      - ./dbt_project:/opt/dbt_project
+      - airflow_logs:/opt/airflow/logs
+    networks:
+      - data_stack_network
+    environment:
+      - AIRFLOW__CORE__EXECUTOR=LocalExecutor
+      - AIRFLOW__DATABASE__SQL_ALCHEMY_CONN=postgresql+psycopg2://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
+      - CLICKHOUSE_USER=${CLICKHOUSE_USER}
+      - CLICKHOUSE_PASSWORD=${CLICKHOUSE_PASSWORD}
+      - AIRFLOW_UID=${AIRFLOW_UID}
+      - AIRFLOW_GID=${AIRFLOW_GID}
+      - AIRFLOW__WEBSERVER__SECRET_KEY=${AIRFLOW_SECRET_KEY}
+    command: webserver
+    healthcheck:
+      test: ["CMD", "curl", "--fail", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  airflow-scheduler:
+    build:
+      context: ./airflow
+      args:
+        AIRFLOW_UID: ${AIRFLOW_UID}
+        AIRFLOW_GID: ${AIRFLOW_GID}
+    container_name: airflow-scheduler
+    restart: always
+    depends_on:
+      - airflow-init
+    volumes:
+      - ./airflow/dags:/opt/airflow/dags
+      - ./dbt_project:/opt/dbt_project
+      - airflow_logs:/opt/airflow/logs
+    networks:
+      - data_stack_network
+    environment:
+      - AIRFLOW__CORE__EXECUTOR=LocalExecutor
+      - AIRFLOW__DATABASE__SQL_ALCHEMY_CONN=postgresql+psycopg2://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
+      - CLICKHOUSE_USER=${CLICKHOUSE_USER}
+      - CLICKHOUSE_PASSWORD=${CLICKHOUSE_PASSWORD}
+      - AIRFLOW_UID=${AIRFLOW_UID}
+      - AIRFLOW_GID=${AIRFLOW_GID}
+      - AIRFLOW__WEBSERVER__SECRET_KEY=${AIRFLOW_SECRET_KEY}
+    command: scheduler
+
+volumes:
+  clickhouse_data:
+  postgres_data:
+  airflow_logs:
+  # (Optional) dbt_project_volume: # uncomment if prefer named volume instead of bind mount
+
+networks:
+  data_stack_network:
+    driver: bridge

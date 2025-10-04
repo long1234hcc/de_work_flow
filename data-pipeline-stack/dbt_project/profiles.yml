@@ -1,0 +1,22 @@
+docker_pipeline_profile:
+  target: local_dev
+  outputs:
+
+    local_dev:
+      type: clickhouse
+      host: localhost       
+      port: 8123
+      schema: default
+      user: default          
+      password: default 
+      threads: 4
+
+    # Target dành riêng cho môi trường Docker
+    docker_pipeline:
+      type: clickhouse
+      host: dbt_clickhouse
+      port: 8123
+      schema: default
+      user: "{{ env_var('CLICKHOUSE_USER') }}"
+      password: "{{ env_var('CLICKHOUSE_PASSWORD') }}"
+      threads: 4
