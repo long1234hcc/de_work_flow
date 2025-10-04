@@ -1,0 +1,61 @@
+# =========================================
+# 🔒  Sensitive files
+# =========================================
+.env
+dbt_project/profiles.yml
+dbt_project/.user.yml
+
+# =========================================
+# 🧱  DBT build outputs
+# =========================================
+dbt_project/target/
+dbt_project/logs/
+dbt_project/dbt_packages/
+dbt_project/run/
+*.log
+*.msgpack
+*.json
+*.gpickle
+*.sql
+
+# =========================================
+# 🪶 Airflow temporary and log files
+# =========================================
+airflow/logs/
+airflow/__pycache__/
+airflow/*.pyc
+airflow/*.pid
+
+# =========================================
+# 🐳 Docker and environment files
+# =========================================
+*.pid
+*.tar
+*.bak
+*.tmp
+*.swp
+.env.local
+.env.*
+!.env.example
+
+# =========================================
+# 🧠 IDE & OS junk
+# =========================================
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+.envrc
+
+# =========================================
+# 🧪 Test / Cache folders
+# =========================================
+.pytest_cache/
+.mypy_cache/
+coverage/
+.cache/

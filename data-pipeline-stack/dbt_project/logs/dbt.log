@@ -1,2 +1,284 @@
-{"data":{"log_version":3,"version":"2.0.0-preview.25"},"info":{"category":"","code":"1005","extra":{},"invocation_id":"01997efc-2004-7950-9b54-2c6766caec40","level":"error","msg":"error: dbt1005: Failed to parse profiles.yml: unknown variant `clickhouse`, expected one of `redshift`, `snowflake`, `postgres`, `bigquery`, `trino`, `datafusion`, `databricks`, `salesforce`","name":"Generic","pid":20220,"thread":"tokio-runtime-worker","ts":"2025-09-25T03:47:56.552962Z"}}
-{"data":{"completed_at":"2025-09-25T03:47:56.553040Z","elapsed":0.0032935000490397215,"log_version":3,"success":false,"version":"2.0.0-preview.25"},"info":{"category":"","code":"","elapsed":"0.0032935000490397215","extra":{},"invocation_id":"01997efc-2004-7950-9b54-2c6766caec40","level":"info","msg":"  Finished 'show'  with 1 error in 3ms","name":"CommandCompleted","pid":20220,"thread":"tokio-runtime-worker","ts":"2025-09-25T03:47:56.553117Z"}}
+dbt-fusion 2.0.0-preview.25
+   Loading profiles.yml
+error: dbt1005: Failed to parse profiles.yml: unknown variant `clickhouse`, expected one of `redshift`, `snowflake`, `postgres`, `bigquery`, `trino`, `datafusion`, `databricks`, `salesforce`
+  Finished 'show'  with 1 error in 7ms
+[0m14:06:24.882149 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'invocation', 'label': 'start', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x78e70f0c7c70>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x78e70df0cee0>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x78e70df0ce80>]}
+
+
+============================== 14:06:24.894469 | 5754c957-3f27-49c1-bc78-528734c54eff ==============================
+[0m14:06:24.894469 [info ] [MainThread]: Running with dbt=1.10.13
+[0m14:06:24.897435 [debug] [MainThread]: running dbt with arguments {'quiet': 'False', 'log_cache_events': 'False', 'use_colors': 'True', 'indirect_selection': 'eager', 'use_experimental_parser': 'False', 'no_print': 'None', 'empty': 'None', 'cache_selected_only': 'False', 'warn_error_options': 'WarnErrorOptionsV2(error=[], warn=[], silence=[])', 'printer_width': '80', 'profiles_dir': '/mnt/d/dbt_airflo_pipiline/data-pipeline-stack/dbt_project', 'invocation_command': 'dbt show --select stg_my_first_model', 'version_check': 'True', 'introspect': 'True', 'target_path': 'None', 'write_json': 'True', 'debug': 'False', 'log_path': '/mnt/d/dbt_airflo_pipiline/data-pipeline-stack/dbt_project/logs', 'send_anonymous_usage_stats': 'True', 'fail_fast': 'False', 'warn_error': 'None', 'partial_parse': 'True', 'log_format': 'default', 'static_parser': 'True'}
+[0m14:06:25.077721 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'project_id', 'label': '5754c957-3f27-49c1-bc78-528734c54eff', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x78e70ddcd570>]}
+[0m14:06:25.122729 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'adapter_info', 'label': '5754c957-3f27-49c1-bc78-528734c54eff', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x78e70ddcd0f0>]}
+[0m14:06:25.136397 [info ] [MainThread]: Registered adapter: clickhouse=1.9.2
+[0m14:06:25.187798 [debug] [MainThread]: checksum: 9f0c81e2574b4ff463f3d16d080df83c6982fc0372c9feeacae0504ac9ea3ffe, vars: {}, profile: , target: , version: 1.10.13
+[0m14:06:25.296040 [info ] [MainThread]: Unable to do partial parsing because of a version mismatch
+[0m14:06:25.297354 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'partial_parser', 'label': '5754c957-3f27-49c1-bc78-528734c54eff', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x78e71082e050>]}
+[0m14:06:26.080365 [warn ] [MainThread]: [[33mWARNING[0m]: Configuration paths exist in your dbt_project.yml file which do not apply to any resources.
+There are 3 unused configuration paths:
+- models.marts
+- models.staging
+- models.intermediate
+[0m14:06:26.084902 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'load_project', 'label': '5754c957-3f27-49c1-bc78-528734c54eff', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x78e70d8ecee0>]}
+[0m14:06:26.168750 [debug] [MainThread]: Wrote artifact WritableManifest to /mnt/d/dbt_airflo_pipiline/data-pipeline-stack/dbt_project/target/manifest.json
+[0m14:06:26.186081 [debug] [MainThread]: Wrote artifact SemanticManifest to /mnt/d/dbt_airflo_pipiline/data-pipeline-stack/dbt_project/target/semantic_manifest.json
+[0m14:06:26.241655 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'resource_counts', 'label': '5754c957-3f27-49c1-bc78-528734c54eff', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x78e70d8ee890>]}
+[0m14:06:26.242987 [info ] [MainThread]: Found 1 model, 477 macros
+[0m14:06:26.244476 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'runnable_timing', 'label': '5754c957-3f27-49c1-bc78-528734c54eff', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x78e70d8ef3a0>]}
+[0m14:06:26.246658 [info ] [MainThread]: 
+[0m14:06:26.247519 [info ] [MainThread]: Concurrency: 4 threads (target='local_dev')
+[0m14:06:26.248924 [info ] [MainThread]: 
+[0m14:06:26.250370 [debug] [MainThread]: Acquiring new clickhouse connection 'master'
+[0m14:06:26.251888 [debug] [ThreadPool]: Acquiring new clickhouse connection 'list__default'
+[0m14:06:26.272499 [debug] [ThreadPool]: Opening a new connection, currently in state init
+[0m14:06:26.764207 [debug] [ThreadPool]: dbt_clickhouse adapter: Got a retryable error when attempting to open a clickhouse connection.
+1 attempts remaining. Retrying in 1 seconds.
+Error:
+Error HTTPConnectionPool(host='localhost', port=8123): Max retries exceeded with url: /? (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x78e69bc96b90>: Failed to establish a new connection: [Errno 111] Connection refused')) executing HTTP request attempt 1 (http://localhost:8123)
+[0m14:06:27.767672 [debug] [ThreadPool]: dbt_clickhouse adapter: Error running SQL: macro list_relations_without_caching
+[0m14:06:27.773115 [debug] [MainThread]: Connection 'master' was properly closed.
+[0m14:06:27.776571 [debug] [MainThread]: Connection 'list__default' was left open.
+[0m14:06:27.778458 [debug] [MainThread]: On list__default: No close available on handle
+[0m14:06:27.780247 [error] [MainThread]: Encountered an error:
+Database Error
+  Error HTTPConnectionPool(host='localhost', port=8123): Max retries exceeded with url: /? (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x78e69bc970d0>: Failed to establish a new connection: [Errno 111] Connection refused')) executing HTTP request attempt 1 (http://localhost:8123)
+[0m14:06:27.782481 [debug] [MainThread]: Resource report: {"command_name": "show", "command_success": false, "command_wall_clock_time": 2.948436, "process_in_blocks": "76088", "process_kernel_time": 0.23025, "process_mem_max_rss": "154416", "process_out_blocks": "0", "process_user_time": 3.493614}
+[0m14:06:27.784084 [debug] [MainThread]: Command `dbt show` failed at 14:06:27.783986 after 2.95 seconds
+[0m14:06:27.785443 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'invocation', 'label': 'end', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x78e70f0c7c70>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x78e70d85ee30>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x78e69bc973a0>]}
+[0m14:06:27.786556 [debug] [MainThread]: Flushing usage events
+[0m14:06:28.850437 [debug] [MainThread]: An error was encountered while trying to flush usage events
+[0m14:08:01.392143 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'invocation', 'label': 'start', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x7915384c3b80>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x791537258e20>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x791537258dc0>]}
+
+
+============================== 14:08:01.395519 | 7872680b-2d79-4071-b266-f0f76d3acbff ==============================
+[0m14:08:01.395519 [info ] [MainThread]: Running with dbt=1.10.13
+[0m14:08:01.396201 [debug] [MainThread]: running dbt with arguments {'version_check': 'True', 'log_format': 'default', 'empty': 'False', 'partial_parse': 'True', 'use_colors': 'True', 'profiles_dir': '/mnt/d/dbt_airflo_pipiline/data-pipeline-stack/dbt_project', 'log_cache_events': 'False', 'invocation_command': 'dbt compile --select stg_my_first_model', 'quiet': 'False', 'printer_width': '80', 'warn_error': 'None', 'debug': 'False', 'indirect_selection': 'eager', 'static_parser': 'True', 'target_path': 'None', 'cache_selected_only': 'False', 'no_print': 'None', 'log_path': '/mnt/d/dbt_airflo_pipiline/data-pipeline-stack/dbt_project/logs', 'write_json': 'True', 'send_anonymous_usage_stats': 'True', 'use_experimental_parser': 'False', 'warn_error_options': 'WarnErrorOptionsV2(error=[], warn=[], silence=[])', 'introspect': 'True', 'fail_fast': 'False'}
+[0m14:08:01.573069 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'project_id', 'label': '7872680b-2d79-4071-b266-f0f76d3acbff', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x79153711bee0>]}
+[0m14:08:01.616407 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'adapter_info', 'label': '7872680b-2d79-4071-b266-f0f76d3acbff', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x7915372120b0>]}
+[0m14:08:01.618472 [info ] [MainThread]: Registered adapter: clickhouse=1.9.2
+[0m14:08:01.664694 [debug] [MainThread]: checksum: 9f0c81e2574b4ff463f3d16d080df83c6982fc0372c9feeacae0504ac9ea3ffe, vars: {}, profile: , target: , version: 1.10.13
+[0m14:08:01.771162 [debug] [MainThread]: Partial parsing enabled: 0 files deleted, 0 files added, 0 files changed.
+[0m14:08:01.772055 [debug] [MainThread]: Partial parsing enabled, no changes found, skipping parsing
+[0m14:08:01.778186 [warn ] [MainThread]: [[33mWARNING[0m]: Configuration paths exist in your dbt_project.yml file which do not apply to any resources.
+There are 3 unused configuration paths:
+- models.marts
+- models.intermediate
+- models.staging
+[0m14:08:01.795286 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'load_project', 'label': '7872680b-2d79-4071-b266-f0f76d3acbff', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x791536c01ae0>]}
+[0m14:08:01.847859 [debug] [MainThread]: Wrote artifact WritableManifest to /mnt/d/dbt_airflo_pipiline/data-pipeline-stack/dbt_project/target/manifest.json
+[0m14:08:01.851557 [debug] [MainThread]: Wrote artifact SemanticManifest to /mnt/d/dbt_airflo_pipiline/data-pipeline-stack/dbt_project/target/semantic_manifest.json
+[0m14:08:01.871540 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'resource_counts', 'label': '7872680b-2d79-4071-b266-f0f76d3acbff', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x791536c2cb20>]}
+[0m14:08:01.875800 [info ] [MainThread]: Found 1 model, 477 macros
+[0m14:08:01.893056 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'runnable_timing', 'label': '7872680b-2d79-4071-b266-f0f76d3acbff', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x791536bf7160>]}
+[0m14:08:01.895899 [info ] [MainThread]: 
+[0m14:08:01.897081 [info ] [MainThread]: Concurrency: 4 threads (target='local_dev')
+[0m14:08:01.897923 [info ] [MainThread]: 
+[0m14:08:01.898863 [debug] [MainThread]: Acquiring new clickhouse connection 'master'
+[0m14:08:01.900232 [debug] [ThreadPool]: Acquiring new clickhouse connection 'list__default'
+[0m14:08:01.948870 [debug] [ThreadPool]: Opening a new connection, currently in state init
+[0m14:08:02.378727 [debug] [ThreadPool]: dbt_clickhouse adapter: Got a retryable error when attempting to open a clickhouse connection.
+1 attempts remaining. Retrying in 1 seconds.
+Error:
+Error HTTPConnectionPool(host='localhost', port=8123): Max retries exceeded with url: /? (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x7915071f5b40>: Failed to establish a new connection: [Errno 111] Connection refused')) executing HTTP request attempt 1 (http://localhost:8123)
+[0m14:08:03.384627 [debug] [ThreadPool]: dbt_clickhouse adapter: Error running SQL: macro list_relations_without_caching
+[0m14:08:03.388547 [debug] [MainThread]: Connection 'master' was properly closed.
+[0m14:08:03.390633 [debug] [MainThread]: Connection 'list__default' was left open.
+[0m14:08:03.392645 [debug] [MainThread]: On list__default: No close available on handle
+[0m14:08:03.394619 [error] [MainThread]: Encountered an error:
+Database Error
+  Error HTTPConnectionPool(host='localhost', port=8123): Max retries exceeded with url: /? (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x7915071f6080>: Failed to establish a new connection: [Errno 111] Connection refused')) executing HTTP request attempt 1 (http://localhost:8123)
+[0m14:08:03.400681 [debug] [MainThread]: Resource report: {"command_name": "compile", "command_success": false, "command_wall_clock_time": 2.0576346, "process_in_blocks": "136752", "process_kernel_time": 0.362794, "process_mem_max_rss": "151580", "process_out_blocks": "0", "process_user_time": 2.830753}
+[0m14:08:03.403184 [debug] [MainThread]: Command `dbt compile` failed at 14:08:03.402993 after 2.06 seconds
+[0m14:08:03.404610 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'invocation', 'label': 'end', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x7915384c3b80>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x791536c2c070>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x7915071f6350>]}
+[0m14:08:03.405785 [debug] [MainThread]: Flushing usage events
+[0m14:08:04.348395 [debug] [MainThread]: An error was encountered while trying to flush usage events
+[0m14:08:43.914875 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'invocation', 'label': 'start', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x7941ac4bfc10>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x7941ab258e80>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x7941ab258e20>]}
+
+
+============================== 14:08:43.917197 | 213bdd18-5be8-4b91-b18e-35017fc29b31 ==============================
+[0m14:08:43.917197 [info ] [MainThread]: Running with dbt=1.10.13
+[0m14:08:43.918112 [debug] [MainThread]: running dbt with arguments {'warn_error_options': 'WarnErrorOptionsV2(error=[], warn=[], silence=[])', 'empty': 'False', 'printer_width': '80', 'log_cache_events': 'False', 'log_path': '/mnt/d/dbt_airflo_pipiline/data-pipeline-stack/dbt_project/logs', 'indirect_selection': 'eager', 'send_anonymous_usage_stats': 'True', 'debug': 'False', 'fail_fast': 'False', 'static_parser': 'True', 'use_colors': 'True', 'partial_parse': 'True', 'profiles_dir': '/mnt/d/dbt_airflo_pipiline/data-pipeline-stack/dbt_project', 'log_format': 'default', 'target_path': 'None', 'write_json': 'True', 'use_experimental_parser': 'False', 'version_check': 'True', 'no_print': 'None', 'introspect': 'True', 'warn_error': 'None', 'quiet': 'False', 'invocation_command': 'dbt compile --select stg_my_first_model', 'cache_selected_only': 'False'}
+[0m14:08:44.047087 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'project_id', 'label': '213bdd18-5be8-4b91-b18e-35017fc29b31', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x7941adb97640>]}
+[0m14:08:44.091414 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'adapter_info', 'label': '213bdd18-5be8-4b91-b18e-35017fc29b31', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x7941ab4729b0>]}
+[0m14:08:44.092898 [info ] [MainThread]: Registered adapter: clickhouse=1.9.2
+[0m14:08:44.148714 [debug] [MainThread]: checksum: 9f0c81e2574b4ff463f3d16d080df83c6982fc0372c9feeacae0504ac9ea3ffe, vars: {}, profile: , target: , version: 1.10.13
+[0m14:08:44.244932 [debug] [MainThread]: Partial parsing enabled: 0 files deleted, 0 files added, 0 files changed.
+[0m14:08:44.245631 [debug] [MainThread]: Partial parsing enabled, no changes found, skipping parsing
+[0m14:08:44.250444 [warn ] [MainThread]: [[33mWARNING[0m]: Configuration paths exist in your dbt_project.yml file which do not apply to any resources.
+There are 3 unused configuration paths:
+- models.staging
+- models.marts
+- models.intermediate
+[0m14:08:44.266243 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'load_project', 'label': '213bdd18-5be8-4b91-b18e-35017fc29b31', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x7941aac05b70>]}
+[0m14:08:44.323663 [debug] [MainThread]: Wrote artifact WritableManifest to /mnt/d/dbt_airflo_pipiline/data-pipeline-stack/dbt_project/target/manifest.json
+[0m14:08:44.327666 [debug] [MainThread]: Wrote artifact SemanticManifest to /mnt/d/dbt_airflo_pipiline/data-pipeline-stack/dbt_project/target/semantic_manifest.json
+[0m14:08:44.339171 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'resource_counts', 'label': '213bdd18-5be8-4b91-b18e-35017fc29b31', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x7941aac308b0>]}
+[0m14:08:44.340205 [info ] [MainThread]: Found 1 model, 477 macros
+[0m14:08:44.341147 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'runnable_timing', 'label': '213bdd18-5be8-4b91-b18e-35017fc29b31', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x7941aad083a0>]}
+[0m14:08:44.342551 [info ] [MainThread]: 
+[0m14:08:44.343686 [info ] [MainThread]: Concurrency: 4 threads (target='local_dev')
+[0m14:08:44.349030 [info ] [MainThread]: 
+[0m14:08:44.351473 [debug] [MainThread]: Acquiring new clickhouse connection 'master'
+[0m14:08:44.352860 [debug] [ThreadPool]: Acquiring new clickhouse connection 'list__default'
+[0m14:08:44.403661 [debug] [ThreadPool]: Opening a new connection, currently in state init
+[0m14:08:44.593728 [debug] [ThreadPool]: dbt_clickhouse adapter: Got a retryable error when attempting to open a clickhouse connection.
+1 attempts remaining. Retrying in 1 seconds.
+Error:
+Error HTTPConnectionPool(host='localhost', port=8123): Max retries exceeded with url: /? (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x79417b17dbd0>: Failed to establish a new connection: [Errno 111] Connection refused')) executing HTTP request attempt 1 (http://localhost:8123)
+[0m14:08:45.598542 [debug] [ThreadPool]: dbt_clickhouse adapter: Error running SQL: macro list_relations_without_caching
+[0m14:08:45.601322 [debug] [MainThread]: Connection 'master' was properly closed.
+[0m14:08:45.603337 [debug] [MainThread]: Connection 'list__default' was left open.
+[0m14:08:45.604797 [debug] [MainThread]: On list__default: No close available on handle
+[0m14:08:45.606694 [error] [MainThread]: Encountered an error:
+Database Error
+  Error HTTPConnectionPool(host='localhost', port=8123): Max retries exceeded with url: /? (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x79417b17e110>: Failed to establish a new connection: [Errno 111] Connection refused')) executing HTTP request attempt 1 (http://localhost:8123)
+[0m14:08:45.609463 [debug] [MainThread]: Resource report: {"command_name": "compile", "command_success": false, "command_wall_clock_time": 1.7443584, "process_in_blocks": "0", "process_kernel_time": 0.134461, "process_mem_max_rss": "152092", "process_out_blocks": "0", "process_user_time": 2.805762}
+[0m14:08:45.610887 [debug] [MainThread]: Command `dbt compile` failed at 14:08:45.610669 after 1.75 seconds
+[0m14:08:45.611981 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'invocation', 'label': 'end', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x7941ac4bfc10>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x7941aac30b50>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x79417b17e3e0>]}
+[0m14:08:45.613130 [debug] [MainThread]: Flushing usage events
+[0m14:08:46.641642 [debug] [MainThread]: An error was encountered while trying to flush usage events
+[0m14:15:54.932579 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'invocation', 'label': 'start', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x7c876bacbc10>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x7c876a864e80>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x7c876a864e20>]}
+
+
+============================== 14:15:54.937464 | 3f5ba6f0-6e4f-41e8-a8c4-d8a3bc439730 ==============================
+[0m14:15:54.937464 [info ] [MainThread]: Running with dbt=1.10.13
+[0m14:15:54.938570 [debug] [MainThread]: running dbt with arguments {'profiles_dir': '/mnt/d/dbt_airflo_pipiline/data-pipeline-stack/dbt_project', 'debug': 'False', 'printer_width': '80', 'static_parser': 'True', 'use_colors': 'True', 'log_path': '/mnt/d/dbt_airflo_pipiline/data-pipeline-stack/dbt_project/logs', 'no_print': 'None', 'target_path': 'None', 'empty': 'False', 'introspect': 'True', 'fail_fast': 'False', 'cache_selected_only': 'False', 'quiet': 'False', 'write_json': 'True', 'warn_error_options': 'WarnErrorOptionsV2(error=[], warn=[], silence=[])', 'invocation_command': 'dbt compile --select stg_my_first_model', 'partial_parse': 'True', 'log_format': 'default', 'indirect_selection': 'eager', 'use_experimental_parser': 'False', 'send_anonymous_usage_stats': 'True', 'warn_error': 'None', 'version_check': 'True', 'log_cache_events': 'False'}
+[0m14:15:55.202857 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'project_id', 'label': '3f5ba6f0-6e4f-41e8-a8c4-d8a3bc439730', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x7c876d1cf640>]}
+[0m14:15:55.271348 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'adapter_info', 'label': '3f5ba6f0-6e4f-41e8-a8c4-d8a3bc439730', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x7c876aa7e9b0>]}
+[0m14:15:55.273468 [info ] [MainThread]: Registered adapter: clickhouse=1.9.2
+[0m14:15:55.345756 [debug] [MainThread]: checksum: 9f0c81e2574b4ff463f3d16d080df83c6982fc0372c9feeacae0504ac9ea3ffe, vars: {}, profile: , target: , version: 1.10.13
+[0m14:15:55.506975 [debug] [MainThread]: Partial parsing enabled: 0 files deleted, 0 files added, 0 files changed.
+[0m14:15:55.508157 [debug] [MainThread]: Partial parsing enabled, no changes found, skipping parsing
+[0m14:15:55.515906 [warn ] [MainThread]: [[33mWARNING[0m]: Configuration paths exist in your dbt_project.yml file which do not apply to any resources.
+There are 3 unused configuration paths:
+- models.marts
+- models.intermediate
+- models.staging
+[0m14:15:55.541546 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'load_project', 'label': '3f5ba6f0-6e4f-41e8-a8c4-d8a3bc439730', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x7c876a20db70>]}
+[0m14:15:55.616108 [debug] [MainThread]: Wrote artifact WritableManifest to /mnt/d/dbt_airflo_pipiline/data-pipeline-stack/dbt_project/target/manifest.json
+[0m14:15:55.627925 [debug] [MainThread]: Wrote artifact SemanticManifest to /mnt/d/dbt_airflo_pipiline/data-pipeline-stack/dbt_project/target/semantic_manifest.json
+[0m14:15:55.652309 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'resource_counts', 'label': '3f5ba6f0-6e4f-41e8-a8c4-d8a3bc439730', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x7c876a2388b0>]}
+[0m14:15:55.653845 [info ] [MainThread]: Found 1 model, 477 macros
+[0m14:15:55.655101 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'runnable_timing', 'label': '3f5ba6f0-6e4f-41e8-a8c4-d8a3bc439730', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x7c876a3143a0>]}
+[0m14:15:55.659154 [info ] [MainThread]: 
+[0m14:15:55.660951 [info ] [MainThread]: Concurrency: 4 threads (target='local_dev')
+[0m14:15:55.662044 [info ] [MainThread]: 
+[0m14:15:55.663418 [debug] [MainThread]: Acquiring new clickhouse connection 'master'
+[0m14:15:55.665401 [debug] [ThreadPool]: Acquiring new clickhouse connection 'list__default'
+[0m14:15:55.722970 [debug] [ThreadPool]: Opening a new connection, currently in state init
+[0m14:15:56.403351 [debug] [ThreadPool]: dbt_clickhouse adapter: On list__default: /* {"app": "dbt", "dbt_version": "1.10.13", "profile_name": "docker_pipeline_profile", "target_name": "local_dev", "connection_name": "list__default"} */
+select
+      t.name as name,
+      t.database as schema,
+      multiIf(
+        engine in ('MaterializedView', 'View'), 'view',
+        engine = 'Dictionary', 'dictionary',
+        'table'
+      ) as type,
+      db.engine as db_engine,0 as is_on_cluster
+          from system.tables as t join system.databases as db on t.database = db.name
+        where schema = 'default'
+      
+
+  ...
+[0m14:15:56.408240 [debug] [ThreadPool]: dbt_clickhouse adapter: SQL status: OK in 0.00 seconds
+[0m14:15:56.435904 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'runnable_timing', 'label': '3f5ba6f0-6e4f-41e8-a8c4-d8a3bc439730', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x7c876a865de0>]}
+[0m14:15:56.441488 [debug] [Thread-1 (]: Began running node model.my_dbt_project.stg_my_first_model
+[0m14:15:56.442642 [debug] [Thread-1 (]: Re-using an available connection from the pool (formerly list__default, now model.my_dbt_project.stg_my_first_model)
+[0m14:15:56.443604 [debug] [Thread-1 (]: Began compiling node model.my_dbt_project.stg_my_first_model
+[0m14:15:56.494407 [debug] [Thread-1 (]: Writing injected SQL for node "model.my_dbt_project.stg_my_first_model"
+[0m14:15:56.528194 [debug] [Thread-1 (]: Began executing node model.my_dbt_project.stg_my_first_model
+[0m14:15:56.529452 [debug] [Thread-1 (]: Finished running node model.my_dbt_project.stg_my_first_model
+[0m14:15:56.531270 [debug] [MainThread]: Connection 'master' was properly closed.
+[0m14:15:56.532383 [debug] [MainThread]: Connection 'model.my_dbt_project.stg_my_first_model' was left open.
+[0m14:15:56.533188 [debug] [MainThread]: On model.my_dbt_project.stg_my_first_model: Close
+[0m14:15:56.534178 [debug] [MainThread]: Command end result
+[0m14:15:56.572041 [debug] [MainThread]: Wrote artifact WritableManifest to /mnt/d/dbt_airflo_pipiline/data-pipeline-stack/dbt_project/target/manifest.json
+[0m14:15:56.579721 [debug] [MainThread]: Wrote artifact SemanticManifest to /mnt/d/dbt_airflo_pipiline/data-pipeline-stack/dbt_project/target/semantic_manifest.json
+[0m14:15:56.616154 [debug] [MainThread]: Wrote artifact RunExecutionResult to /mnt/d/dbt_airflo_pipiline/data-pipeline-stack/dbt_project/target/run_results.json
+[0m14:15:56.617671 [info ] [MainThread]: Compiled node 'stg_my_first_model' is:
+-- models/stg_my_first_model.sql
+
+
+
+SELECT
+    1 AS user_id,
+    'John Doe' AS user_name,
+    'active' AS status,
+    NOW() AS created_at
+
+UNION ALL
+
+SELECT
+    2 AS user_id,
+    'Jane Smith' AS user_name,
+    'inactive' AS status,
+    NOW() AS created_at
+[0m14:15:56.620282 [debug] [MainThread]: Resource report: {"command_name": "compile", "command_success": true, "command_wall_clock_time": 1.767938, "process_in_blocks": "137816", "process_kernel_time": 0.421028, "process_mem_max_rss": "157176", "process_out_blocks": "0", "process_user_time": 3.705977}
+[0m14:15:56.621650 [debug] [MainThread]: Command `dbt compile` succeeded at 14:15:56.621531 after 1.77 seconds
+[0m14:15:56.622956 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'invocation', 'label': 'end', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x7c876bacbc10>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x7c876a74e020>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x7c876aa7e9b0>]}
+[0m14:15:56.624146 [debug] [MainThread]: Flushing usage events
+[0m14:15:57.670476 [debug] [MainThread]: An error was encountered while trying to flush usage events
+[0m17:59:48.001441 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'invocation', 'label': 'start', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x71862cfcbbe0>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x71862bd64d30>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x71862bd64cd0>]}
+
+
+============================== 17:59:48.008774 | c1fb7fb3-4db1-4bcf-93bd-88131ea2cce9 ==============================
+[0m17:59:48.008774 [info ] [MainThread]: Running with dbt=1.10.13
+[0m17:59:48.010648 [debug] [MainThread]: running dbt with arguments {'introspect': 'True', 'quiet': 'False', 'version_check': 'True', 'cache_selected_only': 'False', 'log_path': '/mnt/d/dbt_airflo_pipiline/data-pipeline-stack/dbt_project/logs', 'indirect_selection': 'eager', 'warn_error_options': 'WarnErrorOptionsV2(error=[], warn=[], silence=[])', 'debug': 'False', 'profiles_dir': '/mnt/d/dbt_airflo_pipiline/data-pipeline-stack/dbt_project', 'printer_width': '80', 'partial_parse': 'True', 'send_anonymous_usage_stats': 'True', 'log_format': 'default', 'use_experimental_parser': 'False', 'use_colors': 'True', 'no_print': 'None', 'fail_fast': 'False', 'write_json': 'True', 'target_path': 'None', 'log_cache_events': 'False', 'static_parser': 'True', 'invocation_command': 'dbt debug', 'warn_error': 'None', 'empty': 'None'}
+[0m17:59:48.023022 [info ] [MainThread]: dbt version: 1.10.13
+[0m17:59:48.024492 [info ] [MainThread]: python version: 3.10.12
+[0m17:59:48.025754 [info ] [MainThread]: python path: /usr/bin/python3
+[0m17:59:48.027592 [info ] [MainThread]: os info: Linux-6.6.87.2-microsoft-standard-WSL2-x86_64-with-glibc2.35
+[0m17:59:48.133654 [info ] [MainThread]: Using profiles dir at /mnt/d/dbt_airflo_pipiline/data-pipeline-stack/dbt_project
+[0m17:59:48.136289 [info ] [MainThread]: Using profiles.yml file at /mnt/d/dbt_airflo_pipiline/data-pipeline-stack/dbt_project/profiles.yml
+[0m17:59:48.138080 [info ] [MainThread]: Using dbt_project.yml file at /mnt/d/dbt_airflo_pipiline/data-pipeline-stack/dbt_project/dbt_project.yml
+[0m17:59:48.140141 [info ] [MainThread]: adapter type: clickhouse
+[0m17:59:48.142367 [info ] [MainThread]: adapter version: 1.9.2
+[0m17:59:48.298845 [info ] [MainThread]: Configuration:
+[0m17:59:48.300605 [info ] [MainThread]:   profiles.yml file [[32mOK found and valid[0m]
+[0m17:59:48.302224 [info ] [MainThread]:   dbt_project.yml file [[32mOK found and valid[0m]
+[0m17:59:48.303855 [info ] [MainThread]: Required dependencies:
+[0m17:59:48.305285 [debug] [MainThread]: Executing "git --help"
+[0m17:59:48.309321 [debug] [MainThread]: STDOUT: "b"usage: git [--version] [--help] [-C <path>] [-c <name>=<value>]\n           [--exec-path[=<path>]] [--html-path] [--man-path] [--info-path]\n           [-p | --paginate | -P | --no-pager] [--no-replace-objects] [--bare]\n           [--git-dir=<path>] [--work-tree=<path>] [--namespace=<name>]\n           [--super-prefix=<path>] [--config-env=<name>=<envvar>]\n           <command> [<args>]\n\nThese are common Git commands used in various situations:\n\nstart a working area (see also: git help tutorial)\n   clone     Clone a repository into a new directory\n   init      Create an empty Git repository or reinitialize an existing one\n\nwork on the current change (see also: git help everyday)\n   add       Add file contents to the index\n   mv        Move or rename a file, a directory, or a symlink\n   restore   Restore working tree files\n   rm        Remove files from the working tree and from the index\n\nexamine the history and state (see also: git help revisions)\n   bisect    Use binary search to find the commit that introduced a bug\n   diff      Show changes between commits, commit and working tree, etc\n   grep      Print lines matching a pattern\n   log       Show commit logs\n   show      Show various types of objects\n   status    Show the working tree status\n\ngrow, mark and tweak your common history\n   branch    List, create, or delete branches\n   commit    Record changes to the repository\n   merge     Join two or more development histories together\n   rebase    Reapply commits on top of another base tip\n   reset     Reset current HEAD to the specified state\n   switch    Switch branches\n   tag       Create, list, delete or verify a tag object signed with GPG\n\ncollaborate (see also: git help workflows)\n   fetch     Download objects and refs from another repository\n   pull      Fetch from and integrate with another repository or a local branch\n   push      Update remote refs along with associated objects\n\n'git help -a' and 'git help -g' list available subcommands and some\nconcept guides. See 'git help <command>' or 'git help <concept>'\nto read about a specific subcommand or concept.\nSee 'git help git' for an overview of the system.\n""
+[0m17:59:48.311050 [debug] [MainThread]: STDERR: "b''"
+[0m17:59:48.313966 [info ] [MainThread]:  - git [[32mOK found[0m]
+
+[0m17:59:48.316704 [info ] [MainThread]: Connection:
+[0m17:59:48.318706 [info ] [MainThread]:   driver: None
+[0m17:59:48.320330 [info ] [MainThread]:   host: localhost
+[0m17:59:48.321978 [info ] [MainThread]:   port: 8123
+[0m17:59:48.323624 [info ] [MainThread]:   user: default
+[0m17:59:48.325006 [info ] [MainThread]:   schema: default
+[0m17:59:48.327054 [info ] [MainThread]:   retries: 1
+[0m17:59:48.328592 [info ] [MainThread]:   cluster: None
+[0m17:59:48.329889 [info ] [MainThread]:   database_engine: None
+[0m17:59:48.332158 [info ] [MainThread]:   cluster_mode: False
+[0m17:59:48.333862 [info ] [MainThread]:   secure: False
+[0m17:59:48.335380 [info ] [MainThread]:   verify: True
+[0m17:59:48.339412 [info ] [MainThread]:   client_cert: None
+[0m17:59:48.340898 [info ] [MainThread]:   client_cert_key: None
+[0m17:59:48.342572 [info ] [MainThread]:   connect_timeout: 10
+[0m17:59:48.343986 [info ] [MainThread]:   send_receive_timeout: 300
+[0m17:59:48.345690 [info ] [MainThread]:   sync_request_timeout: 5
+[0m17:59:48.347732 [info ] [MainThread]:   compress_block_size: 1048576
+[0m17:59:48.349470 [info ] [MainThread]:   compression: 
+[0m17:59:48.352711 [info ] [MainThread]:   check_exchange: True
+[0m17:59:48.354261 [info ] [MainThread]:   custom_settings: None
+[0m17:59:48.355730 [info ] [MainThread]:   use_lw_deletes: False
+[0m17:59:48.357018 [info ] [MainThread]:   allow_automatic_deduplication: False
+[0m17:59:48.358291 [info ] [MainThread]:   tcp_keepalive: False
+[0m17:59:48.363880 [info ] [MainThread]: Registered adapter: clickhouse=1.9.2
+[0m17:59:48.443317 [debug] [MainThread]: Acquiring new clickhouse connection 'debug'
+[0m17:59:48.444541 [debug] [MainThread]: Opening a new connection, currently in state init
+[0m17:59:49.147028 [debug] [MainThread]: dbt_clickhouse adapter: On debug: select 1 as id...
+[0m17:59:49.160154 [debug] [MainThread]: dbt_clickhouse adapter: SQL status: OK in 0.01 seconds
+[0m17:59:49.218182 [info ] [MainThread]:   Connection test: [[32mOK connection ok[0m]
+
+[0m17:59:49.224116 [info ] [MainThread]: [32mAll checks passed![0m
+[0m17:59:49.227274 [debug] [MainThread]: Resource report: {"command_name": "debug", "command_success": true, "command_wall_clock_time": 1.3681334, "process_in_blocks": "0", "process_kernel_time": 0.468889, "process_mem_max_rss": "151572", "process_out_blocks": "0", "process_user_time": 4.341008}
+[0m17:59:49.230080 [debug] [MainThread]: Command `dbt debug` succeeded at 17:59:49.229759 after 1.37 seconds
+[0m17:59:49.250165 [debug] [MainThread]: Connection 'debug' was left open.
+[0m17:59:49.259837 [debug] [MainThread]: On debug: Close
+[0m17:59:49.266080 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'invocation', 'label': 'end', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x71862cfcbbe0>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x71862cb54f70>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x71862bb921a0>]}
+[0m17:59:49.268562 [debug] [MainThread]: Flushing usage events
+[0m17:59:50.203272 [debug] [MainThread]: An error was encountered while trying to flush usage events
