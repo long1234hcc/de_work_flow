@@ -1,4 +1,4 @@
-# .github/workflows/ci.yaml
+# .github/workflows/ci.yaml (ở root)
 name: dbt Core CI
 
 on:
@@ -15,6 +15,11 @@ jobs:
   dbt_debug_check:
     name: Run dbt debug
     runs-on: ubuntu-latest
+    
+    # QUAN TRỌNG: Thêm defaults để chạy trong thư mục đúng
+    defaults:
+      run:
+        working-directory: ./data-pipeline-stack
 
     steps:
       - name: 1. Check out repository
@@ -26,9 +31,7 @@ jobs:
       - name: 3. Wait for services to become healthy
         run: |
           echo "Waiting for services to start..."
-          # Đợi cho đến khi dbt_clickhouse và airflow-webserver ở trạng thái 'healthy'
-          # Thay vì sleep 30s, cách này thông minh và đáng tin cậy hơn
-          end_time=$((SECONDS+120)) # Đợi tối đa 2 phút
+          end_time=$((SECONDS+120))
           while [ $SECONDS -lt $end_time ]; do
             if [[ "$(docker-compose ps -q dbt_clickhouse)" && \
                   "$(docker-compose ps dbt_clickhouse | grep -c '(healthy)')" -eq 1 && \
@@ -51,5 +54,5 @@ jobs:
           docker-compose exec -T -w /opt/dbt_project airflow-webserver dbt debug --target docker_pipeline
 
       - name: 5. Stop all services
-        if: always() # Luôn chạy bước này dù bước trên thành công hay thất bại
+        if: always()
         run: docker-compose down
