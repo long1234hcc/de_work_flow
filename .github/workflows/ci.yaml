@@ -29,13 +29,28 @@ jobs:
           echo "🐳 Checking Docker Compose version..."
           docker compose version
 
-      - name: 3. Start all services in the background
+      - name: 3. Fix permissions for dbt directories
+        run: |
+          echo "🔧 Setting up permissions for dbt project..."
+          # Tạo directories nếu chưa có
+          mkdir -p dbt_project/logs dbt_project/target
+          
+          # Set ownership cho airflow user (UID 50000)
+          sudo chown -R 50000:0 dbt_project/
+          
+          # Set permissions để airflow user có thể ghi
+          sudo chmod -R 775 dbt_project/
+          
+          echo "✅ Permissions configured:"
+          ls -la dbt_project/
+
+      - name: 4. Start all services in the background
         run: |
           echo "🚀 Starting services with docker compose..."
           docker compose up --build -d
           echo "✅ Services started"
 
-      - name: 4. Wait for services to become healthy
+      - name: 5. Wait for services to become healthy
         run: |
           echo "⏳ Waiting for services to become healthy..."
           end_time=$((SECONDS+180))
@@ -69,29 +84,41 @@ jobs:
             exit 1
           fi
 
-      - name: 5. Verify dbt setup in container
+      - name: 6. Verify dbt setup and permissions
         run: |
           echo "🔍 Checking dbt project structure..."
           docker compose exec -T airflow-webserver ls -la /opt/dbt_project/
+          echo ""
+          echo "🔍 Checking logs directory permissions..."
+          docker compose exec -T airflow-webserver ls -la /opt/dbt_project/logs/ || echo "⚠️ logs directory not accessible"
           echo ""
           echo "📄 Checking dbt_project.yml..."
           docker compose exec -T airflow-webserver cat /opt/dbt_project/dbt_project.yml
           echo ""
           echo "📄 Checking profiles.yml..."
-          docker compose exec -T airflow-webserver cat /opt/dbt_project/profiles.yml || echo "⚠️ profiles.yml not found or not accessible"
+          docker compose exec -T airflow-webserver cat /opt/dbt_project/profiles.yml || echo "⚠️ profiles.yml not found"
+          echo ""
+          echo "👤 Checking current user in container..."
+          docker compose exec -T airflow-webserver whoami
+          docker compose exec -T airflow-webserver id
 
-      - name: 6. Run dbt debug command
+      - name: 7. Run dbt debug command
         run: |
           echo "🔧 Running dbt debug..."
           docker compose exec -T -w /opt/dbt_project airflow-webserver dbt debug --target docker_pipeline
 
-      - name: 7. Show logs on failure
+      - name: 8. Show logs on failure
         if: failure()
         run: |
           echo "❌ Job failed! Showing logs for debugging..."
-          docker compose logs --tail=200
+          echo ""
+          echo "📜 Airflow webserver logs:"
+          docker compose logs --tail=200 airflow-webserver
+          echo ""
+          echo "📜 ClickHouse logs:"
+          docker compose logs --tail=100 dbt_clickhouse
 
-      - name: 8. Stop all services
+      - name: 9. Stop all services
         if: always()
         run: |
           echo "🛑 Stopping all services..."
