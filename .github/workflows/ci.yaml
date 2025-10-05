@@ -26,101 +26,134 @@ jobs:
 
       - name: 2. Verify Docker Compose
         run: |
-          echo "🐳 Checking Docker Compose version..."
+          echo "Checking Docker Compose version..."
           docker compose version
 
-      - name: 3. Fix permissions for dbt directories
+      - name: 3. Create CI-specific Dockerfile with git
         run: |
-          echo "🔧 Setting up permissions for dbt project..."
-          # Tạo directories nếu chưa có
+          echo "Creating CI Dockerfile..."
+          cat > airflow/Dockerfile.ci << 'EOF'
+          FROM apache/airflow:2.9.2-python3.11
+
+          ARG AIRFLOW_UID=50000
+          ARG AIRFLOW_GID=50000
+
+          USER root
+
+          # Install git for dbt debug
+          RUN apt-get update && \
+              apt-get install -y --no-install-recommends git && \
+              apt-get clean && \
+              rm -rf /var/lib/apt/lists/*
+
+          # Create directories and set permissions
+          RUN mkdir -p /opt/dbt/logs /opt/dbt/target /opt/dbt/models \
+              /opt/dbt_project/logs /opt/dbt_project/target && \
+              chown -R ${AIRFLOW_UID}:${AIRFLOW_GID} /opt/dbt /opt/dbt_project && \
+              chmod -R 775 /opt/dbt /opt/dbt_project
+
+          COPY requirements.txt .
+
+          USER airflow
+          RUN pip install --no-cache-dir -r requirements.txt
+          EOF
+          
+          echo "CI Dockerfile created"
+
+      - name: 4. Create CI-specific docker-compose override
+        run: |
+          echo "Creating docker-compose override for CI..."
+          cat > docker-compose.ci.yml << 'EOF'
+          services:
+            airflow-init:
+              build:
+                context: ./airflow
+                dockerfile: Dockerfile.ci
+                args:
+                  AIRFLOW_UID: ${AIRFLOW_UID}
+                  AIRFLOW_GID: ${AIRFLOW_GID}
+            
+            airflow-webserver:
+              build:
+                context: ./airflow
+                dockerfile: Dockerfile.ci
+                args:
+                  AIRFLOW_UID: ${AIRFLOW_UID}
+                  AIRFLOW_GID: ${AIRFLOW_GID}
+            
+            airflow-scheduler:
+              build:
+                context: ./airflow
+                dockerfile: Dockerfile.ci
+                args:
+                  AIRFLOW_UID: ${AIRFLOW_UID}
+                  AIRFLOW_GID: ${AIRFLOW_GID}
+          EOF
+          
+          echo "Docker compose override created"
+
+      - name: 5. Fix permissions for dbt directories
+        run: |
+          echo "Setting up permissions..."
           mkdir -p dbt_project/logs dbt_project/target
-          
-          # Set ownership cho airflow user (UID 50000)
           sudo chown -R 50000:0 dbt_project/
-          
-          # Set permissions để airflow user có thể ghi
           sudo chmod -R 775 dbt_project/
-          
-          echo "✅ Permissions configured:"
           ls -la dbt_project/
 
-      - name: 4. Start all services in the background
+      - name: 6. Start all services with CI config
         run: |
-          echo "🚀 Starting services with docker compose..."
-          docker compose up --build -d
-          echo "✅ Services started"
+          echo "Starting services..."
+          docker compose -f docker-compose.yml -f docker-compose.ci.yml up --build -d
+          echo "Services started"
 
-      - name: 5. Wait for services to become healthy
+      - name: 7. Wait for services to become healthy
         run: |
-          echo "⏳ Waiting for services to become healthy..."
+          echo "Waiting for services..."
           end_time=$((SECONDS+180))
           
           while [ $SECONDS -lt $end_time ]; do
-            echo "🔍 Checking services health... (${SECONDS}s elapsed)"
-            
-            # Show current status
+            echo "Checking health... (${SECONDS}s)"
             docker compose ps
             echo ""
             
-            # Check if both services are healthy
             if docker compose ps | grep -q "dbt_clickhouse.*healthy" && \
                docker compose ps | grep -q "airflow-webserver.*healthy"; then
-              echo "✅ All services are healthy!"
+              echo "All services healthy!"
               break
             fi
             
-            echo "⏳ Services not ready yet, waiting..."
             sleep 10
           done
           
           if [ $SECONDS -ge $end_time ]; then
-            echo "❌ Services did not become healthy in time."
-            echo ""
-            echo "📊 Final container status:"
+            echo "Timeout waiting for services"
             docker compose ps
-            echo ""
-            echo "📜 Container logs (last 100 lines):"
             docker compose logs --tail=100
             exit 1
           fi
 
-      - name: 6. Verify dbt setup and permissions
+      - name: 8. Verify git installation
         run: |
-          echo "🔍 Checking dbt project structure..."
-          docker compose exec -T airflow-webserver ls -la /opt/dbt_project/
-          echo ""
-          echo "🔍 Checking logs directory permissions..."
-          docker compose exec -T airflow-webserver ls -la /opt/dbt_project/logs/ || echo "⚠️ logs directory not accessible"
-          echo ""
-          echo "📄 Checking dbt_project.yml..."
-          docker compose exec -T airflow-webserver cat /opt/dbt_project/dbt_project.yml
-          echo ""
-          echo "📄 Checking profiles.yml..."
-          docker compose exec -T airflow-webserver cat /opt/dbt_project/profiles.yml || echo "⚠️ profiles.yml not found"
-          echo ""
-          echo "👤 Checking current user in container..."
-          docker compose exec -T airflow-webserver whoami
-          docker compose exec -T airflow-webserver id
+          echo "Verifying git in container..."
+          docker compose exec -T airflow-webserver git --version
+          echo "Git verified successfully"
 
-      - name: 7. Run dbt debug command
+      - name: 9. Run dbt debug
         run: |
-          echo "🔧 Running dbt debug..."
-          docker compose exec -T -w /opt/dbt_project airflow-webserver dbt debug --target docker_pipeline --no-version-check
+          echo "Running dbt debug..."
+          docker compose exec -T -w /opt/dbt_project airflow-webserver dbt debug --target docker_pipeline
 
-      - name: 8. Show logs on failure
+      - name: 10. Show logs on failure
         if: failure()
         run: |
-          echo "❌ Job failed! Showing logs for debugging..."
-          echo ""
-          echo "📜 Airflow webserver logs:"
+          echo "Showing logs..."
           docker compose logs --tail=200 airflow-webserver
-          echo ""
-          echo "📜 ClickHouse logs:"
           docker compose logs --tail=100 dbt_clickhouse
 
-      - name: 9. Stop all services
+      - name: 11. Cleanup
         if: always()
         run: |
-          echo "🛑 Stopping all services..."
-          docker compose down -v
-          echo "✅ Cleanup complete"
+          echo "Cleaning up..."
+          docker compose -f docker-compose.yml -f docker-compose.ci.yml down -v
+          rm -f airflow/Dockerfile.ci docker-compose.ci.yml
+          echo "Cleanup complete"
