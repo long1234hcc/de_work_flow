@@ -6,6 +6,8 @@ ARG AIRFLOW_GID=50000
 
 USER root
 
+RUN apt-get update && apt-get install -y --no-install-recommends git && apt-get clean && rm -rf /var/lib/apt/lists/*
+
 
 # Tạo tất cả thư mục cần thiết và set quyền
 RUN mkdir -p /opt/dbt/logs /opt/dbt/target /opt/dbt/models \
