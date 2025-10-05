@@ -105,7 +105,7 @@ jobs:
       - name: 7. Run dbt debug command
         run: |
           echo "🔧 Running dbt debug..."
-          docker compose exec -T -w /opt/dbt_project airflow-webserver dbt debug --target docker_pipeline
+          docker compose exec -T -w /opt/dbt_project airflow-webserver dbt debug --target docker_pipeline --no-version-check
 
       - name: 8. Show logs on failure
         if: failure()
