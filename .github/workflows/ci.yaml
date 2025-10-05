@@ -1,101 +1,159 @@
 # .github/workflows/ci.yaml
-name: dbt Core CI/CD
+name: dbt Core CI
 
-# Kích hoạt workflow cho Pull Request và Push vào nhánh main
 on:
-  pull_request:
-    branches: [ main ]
   push:
-    branches: [ main ]
+    branches:
+      - main
+      - master
+  pull_request:
+    branches:
+      - main
+      - master
 
 jobs:
-  # ====================================================================
-  # JOB 1: CI - Chạy kiểm tra trên mỗi Pull Request
-  # ====================================================================
-  ci_check:
-    name: ✅ CI - Validate dbt Project
+  dbt_debug_check:
+    name: Run dbt debug
     runs-on: ubuntu-latest
-    # Job này CHỈ chạy khi có sự kiện pull_request
-    if: github.event_name == 'pull_request'
+    
+    defaults:
+      run:
+        working-directory: ./data-pipeline-stack
 
     steps:
       - name: 1. Check out repository
         uses: actions/checkout@v4
 
-      - name: 2. Start all services
-        run: docker-compose up --build -d
-
-      - name: 3. Wait for services to become healthy
+      - name: 2. Verify Docker Compose
         run: |
-          echo "Waiting for services to become healthy for CI..."
+          echo "Checking Docker Compose version..."
+          docker compose version
+
+      - name: 3. Create CI-specific Dockerfile with git
+        run: |
+          echo "Creating CI Dockerfile..."
+          cat > airflow/Dockerfile.ci << 'EOF'
+          FROM apache/airflow:2.9.2-python3.11
+
+          ARG AIRFLOW_UID=50000
+          ARG AIRFLOW_GID=50000
+
+          USER root
+
+          # Install git for dbt debug
+          RUN apt-get update && \
+              apt-get install -y --no-install-recommends git && \
+              apt-get clean && \
+              rm -rf /var/lib/apt/lists/*
+
+          # Create directories and set permissions
+          RUN mkdir -p /opt/dbt/logs /opt/dbt/target /opt/dbt/models \
+              /opt/dbt_project/logs /opt/dbt_project/target && \
+              chown -R ${AIRFLOW_UID}:${AIRFLOW_GID} /opt/dbt /opt/dbt_project && \
+              chmod -R 775 /opt/dbt /opt/dbt_project
+
+          COPY requirements.txt .
+
+          USER airflow
+          RUN pip install --no-cache-dir -r requirements.txt
+          EOF
+          
+          echo "CI Dockerfile created"
+
+      - name: 4. Create CI-specific docker-compose override
+        run: |
+          echo "Creating docker-compose override for CI..."
+          cat > docker-compose.ci.yml << 'EOF'
+          services:
+            airflow-init:
+              build:
+                context: ./airflow
+                dockerfile: Dockerfile.ci
+                args:
+                  AIRFLOW_UID: ${AIRFLOW_UID}
+                  AIRFLOW_GID: ${AIRFLOW_GID}
+            
+            airflow-webserver:
+              build:
+                context: ./airflow
+                dockerfile: Dockerfile.ci
+                args:
+                  AIRFLOW_UID: ${AIRFLOW_UID}
+                  AIRFLOW_GID: ${AIRFLOW_GID}
+            
+            airflow-scheduler:
+              build:
+                context: ./airflow
+                dockerfile: Dockerfile.ci
+                args:
+                  AIRFLOW_UID: ${AIRFLOW_UID}
+                  AIRFLOW_GID: ${AIRFLOW_GID}
+          EOF
+          
+          echo "Docker compose override created"
+
+      - name: 5. Fix permissions for dbt directories
+        run: |
+          echo "Setting up permissions..."
+          mkdir -p dbt_project/logs dbt_project/target
+          sudo chown -R 50000:0 dbt_project/
+          sudo chmod -R 775 dbt_project/
+          ls -la dbt_project/
+
+      - name: 6. Start all services with CI config
+        run: |
+          echo "Starting services..."
+          docker compose -f docker-compose.yml -f docker-compose.ci.yml up --build -d
+          echo "Services started"
+
+      - name: 7. Wait for services to become healthy
+        run: |
+          echo "Waiting for services..."
           end_time=$((SECONDS+180))
+          
           while [ $SECONDS -lt $end_time ]; do
+            echo "Checking health... (${SECONDS}s)"
+            docker compose ps
+            echo ""
+            
             if docker compose ps | grep -q "dbt_clickhouse.*healthy" && \
                docker compose ps | grep -q "airflow-webserver.*healthy"; then
-              echo "All services are healthy for CI!"
+              echo "All services healthy!"
               break
             fi
+            
             sleep 10
           done
+          
           if [ $SECONDS -ge $end_time ]; then
-            echo "::error::Timeout waiting for CI services."
-            docker compose logs --tail=200
+            echo "Timeout waiting for services"
+            docker compose ps
+            docker compose logs --tail=100
             exit 1
           fi
 
-      - name: 4. Run dbt debug
+      - name: 8. Verify git installation
         run: |
-          echo "Running dbt debug for CI..."
-          docker-compose exec -T -w /opt/dbt_project airflow-webserver dbt debug --target docker_pipeline
+          echo "Verifying git in container..."
+          docker compose exec -T airflow-webserver git --version
+          echo "Git verified successfully"
 
-      - name: 5. Cleanup CI Environment
+      - name: 9. Run dbt debug
+        run: |
+          echo "Running dbt debug..."
+          docker compose exec -T -w /opt/dbt_project airflow-webserver dbt debug --target docker_pipeline
+
+      - name: 10. Show logs on failure
+        if: failure()
+        run: |
+          echo "Showing logs..."
+          docker compose logs --tail=200 airflow-webserver
+          docker compose logs --tail=100 dbt_clickhouse
+
+      - name: 11. Cleanup
         if: always()
         run: |
-          echo "Cleaning up CI environment..."
-          docker-compose down -v --remove-orphans
-
-  # ====================================================================
-  # JOB 2: CD - Mô phỏng triển khai khi merge vào main
-  # ====================================================================
-  cd_deploy:
-    name: 🚀 CD - Simulate dbt Build
-    runs-on: ubuntu-latest
-    # Job này CHỈ chạy khi có sự kiện push vào nhánh main
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-    
-    steps:
-      - name: 1. Check out repository
-        uses: actions/checkout@v4
-
-      - name: 2. Start required services for CD
-        run: docker-compose up --build -d
-
-      - name: 3. Wait for ClickHouse to become healthy
-        run: |
-          echo "Waiting for ClickHouse to become healthy for CD..."
-          end_time=$((SECONDS+180))
-          while [ $SECONDS -lt $end_time ]; do
-            if docker compose ps | grep -q "dbt_clickhouse.*healthy"; then
-              echo "ClickHouse service is healthy for CD!"
-              break
-            fi
-            sleep 10
-          done
-          if [ $SECONDS -ge $end_time ]; then
-            echo "::error::Timeout waiting for ClickHouse service."
-            docker compose logs --tail=200
-            exit 1
-          fi
-
-      - name: 4. Run dbt build (Simulate Deployment)
-        run: |
-          echo "Simulating deployment by running dbt build..."
-          docker-compose exec -T \
-            -w /opt/dbt_project airflow-webserver \
-            dbt build --target docker_pipeline
-
-      - name: 5. Cleanup CD Environment
-        if: always()
-        run: |
-          echo "Cleaning up CD environment..."
-          docker-compose down -v --remove-orphans
+          echo "Cleaning up..."
+          docker compose -f docker-compose.yml -f docker-compose.ci.yml down -v
+          rm -f airflow/Dockerfile.ci docker-compose.ci.yml
+          echo "Cleanup complete"
