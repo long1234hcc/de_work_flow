@@ -1,0 +1,153 @@
+# .github/workflows/cd.yaml
+name: dbt Core CD
+
+on:
+  push:
+    branches:
+      - main
+      - master
+
+jobs:
+  # Job 1: Chờ CI pass trước khi deploy
+  check-ci:
+    name: Wait for CI to pass
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check CI workflow status
+        uses: lewagon/wait-on-check-action@v1.3.1
+        with:
+          ref: ${{ github.ref }}
+          check-name: 'Run dbt debug'
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          wait-interval: 10
+
+  # Job 2: Deploy dbt models
+  deploy:
+    name: Deploy dbt models
+    needs: check-ci
+    runs-on: ubuntu-latest
+    
+    defaults:
+      run:
+        working-directory: ./data-pipeline-stack
+
+    steps:
+      - name: 1. Check out repository
+        uses: actions/checkout@v4
+
+      - name: 2. Create docker-compose.ci.yml override
+        run: |
+          echo "Creating docker-compose override..."
+          cat > docker-compose.ci.yml << 'EOF'
+          services:
+            airflow-init:
+              build:
+                context: ./airflow
+                args:
+                  AIRFLOW_UID: 50000
+                  AIRFLOW_GID: 0
+
+            airflow-webserver:
+              build:
+                context: ./airflow
+                args:
+                  AIRFLOW_UID: 50000
+                  AIRFLOW_GID: 0
+
+            airflow-scheduler:
+              build:
+                context: ./airflow
+                args:
+                  AIRFLOW_UID: 50000
+                  AIRFLOW_GID: 0
+          EOF
+          echo "Override file created"
+
+      - name: 3. Fix permissions for dbt directories
+        run: |
+          echo "Setting up permissions..."
+          mkdir -p dbt_project/logs dbt_project/target
+          sudo chown -R 50000:0 dbt_project/
+          sudo chmod -R 775 dbt_project/
+          ls -la dbt_project/
+
+      - name: 4. Start all services
+        run: |
+          echo "Starting services..."
+          docker compose -f docker-compose.yml -f docker-compose.ci.yml up --build -d
+          echo "Services started"
+
+      - name: 5. Wait for services to become healthy
+        run: |
+          echo "Waiting for services..."
+          end_time=$((SECONDS+180))
+          
+          while [ $SECONDS -lt $end_time ]; do
+            echo "Checking health... (${SECONDS}s)"
+            docker compose ps
+            echo ""
+            
+            if docker compose ps | grep -q "dbt_clickhouse.*healthy" && \
+               docker compose ps | grep -q "airflow-webserver.*healthy"; then
+              echo "All services healthy!"
+              break
+            fi
+            
+            sleep 10
+          done
+          
+          if [ $SECONDS -ge $end_time ]; then
+            echo "Timeout waiting for services"
+            docker compose ps
+            docker compose logs --tail=100
+            exit 1
+          fi
+
+      - name: 6. Run dbt deps
+        run: |
+          echo "Installing dbt dependencies..."
+          docker compose exec -T -w /opt/dbt_project airflow-webserver dbt deps --target docker_pipeline
+
+      - name: 7. Run dbt test
+        id: dbt_test
+        run: |
+          echo "Running dbt tests..."
+          docker compose exec -T -w /opt/dbt_project airflow-webserver dbt test --target docker_pipeline
+
+      - name: 8. Run dbt build
+        if: success()
+        run: |
+          echo "Building dbt models..."
+          docker compose exec -T -w /opt/dbt_project airflow-webserver dbt build --target docker_pipeline
+
+      - name: 9. Show deployment summary
+        if: success()
+        run: |
+          echo "==================================="
+          echo "✅ Deployment completed successfully!"
+          echo "==================================="
+          echo ""
+          echo "Checking deployed models..."
+          docker compose exec -T -w /opt/dbt_project airflow-webserver dbt ls --target docker_pipeline --resource-type model
+
+      - name: 10. Show logs on failure
+        if: failure()
+        run: |
+          echo "❌ Deployment failed!"
+          echo ""
+          echo "=== Airflow Webserver Logs ==="
+          docker compose logs --tail=200 airflow-webserver
+          echo ""
+          echo "=== ClickHouse Logs ==="
+          docker compose logs --tail=100 dbt_clickhouse
+          echo ""
+          echo "=== dbt Logs ==="
+          docker compose exec -T -w /opt/dbt_project airflow-webserver cat logs/dbt.log || echo "No dbt.log found"
+
+      - name: 11. Cleanup
+        if: always()
+        run: |
+          echo "Cleaning up..."
+          docker compose -f docker-compose.yml -f docker-compose.ci.yml down -v
+          rm -f docker-compose.ci.yml
+          echo "Cleanup complete"
