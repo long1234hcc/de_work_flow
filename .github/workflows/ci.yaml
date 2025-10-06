@@ -12,7 +12,7 @@ on:
 
 jobs:
   dbt_debug_check:
-    name: Run dbt debug
+    name: Run CI dbt 
     runs-on: ubuntu-latest
     
     defaults:
@@ -71,7 +71,7 @@ jobs:
             exit 1
           fi
 
-      - name: 5. Fix dbt_project permissions inside container
+      - name: 5. Set permissions
         run: |
           echo "Fixing permissions inside container..."
           docker compose exec -T --user root airflow-webserver bash -c "
@@ -80,12 +80,6 @@ jobs:
             chmod -R 775 /opt/dbt_project && \
             ls -la /opt/dbt_project/
           "
-
-      - name: 6. Verify git installation
-        run: |
-          echo "Verifying git installation..."
-          docker compose exec -T airflow-webserver which git
-          docker compose exec -T airflow-webserver git --version
 
       - name: 7. Run dbt debug
         run: |
