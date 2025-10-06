@@ -1,4 +1,3 @@
-# .github/workflows/ci.yaml
 name: dbt Core CI
 
 on:
@@ -13,7 +12,7 @@ on:
 
 jobs:
   dbt_debug_check:
-    name: Run dbt debug
+    name: Run CI dbt 
     runs-on: ubuntu-latest
     
     defaults:
@@ -29,50 +28,24 @@ jobs:
           echo "Checking Docker Compose version..."
           docker compose version
 
-      - name: 3. Create docker-compose.ci.yml override
-        run: |
-          echo "Creating CI docker-compose override..."
-          cat > docker-compose.ci.yml << 'EOF'
-          services:
-            airflow-init:
-              build:
-                context: ./airflow
-                args:
-                  AIRFLOW_UID: 50000
-                  AIRFLOW_GID: 0
-
-            airflow-webserver:
-              build:
-                context: ./airflow
-                args:
-                  AIRFLOW_UID: 50000
-                  AIRFLOW_GID: 0
-
-            airflow-scheduler:
-              build:
-                context: ./airflow
-                args:
-                  AIRFLOW_UID: 50000
-                  AIRFLOW_GID: 0
-          EOF
-          
-          echo "CI docker-compose override created"
-
-      - name: 4. Fix permissions for dbt directories
-        run: |
-          echo "Setting up permissions..."
-          mkdir -p dbt_project/logs dbt_project/target
-          sudo chown -R 50000:0 dbt_project/
-          sudo chmod -R 775 dbt_project/
-          ls -la dbt_project/
-
-      - name: 5. Start all services with CI config
+      - name: 3. Start all services
+        env:
+          CLICKHOUSE_USER: default
+          CLICKHOUSE_PASSWORD: clickhouse_password
+          CLICKHOUSE_DB: default
+          POSTGRES_USER: airflow
+          POSTGRES_PASSWORD: airflow
+          POSTGRES_DB: airflow
+          AIRFLOW_UID: 50000
+          AIRFLOW_GID: 0
+          _AIRFLOW_WWW_USER_PASSWORD: airflow
+          AIRFLOW_SECRET_KEY: test_secret_key_for_ci
         run: |
           echo "Starting services..."
-          docker compose -f docker-compose.yml -f docker-compose.ci.yml up --build -d
+          docker compose up --build -d
           echo "Services started"
 
-      - name: 6. Wait for services to become healthy
+      - name: 4. Wait for services to become healthy
         run: |
           echo "Waiting for services..."
           end_time=$((SECONDS+180))
@@ -98,18 +71,22 @@ jobs:
             exit 1
           fi
 
-      - name: 7. Verify git installation
+      - name: 5. Set permissions
         run: |
-          echo "Verifying git installation..."
-          docker compose exec -T airflow-webserver which git
-          docker compose exec -T airflow-webserver git --version
+          echo "Fixing permissions inside container..."
+          docker compose exec -T --user root airflow-webserver bash -c "
+            mkdir -p /opt/dbt_project/logs /opt/dbt_project/target && \
+            chown -R 50000:0 /opt/dbt_project && \
+            chmod -R 775 /opt/dbt_project && \
+            ls -la /opt/dbt_project/
+          "
 
-      - name: 8. Run dbt debug
+      - name: 7. Run dbt debug
         run: |
           echo "Running dbt debug..."
           docker compose exec -T -w /opt/dbt_project airflow-webserver dbt debug --target docker_pipeline
 
-      - name: 9. Show logs on failure
+      - name: 8. Show logs on failure
         if: failure()
         run: |
           echo "Showing logs..."
@@ -117,10 +94,9 @@ jobs:
           docker compose logs --tail=100 dbt_clickhouse
           docker compose logs --tail=100 postgres
 
-      - name: 10. Cleanup
+      - name: 9. Cleanup
         if: always()
         run: |
           echo "Cleaning up..."
-          docker compose -f docker-compose.yml -f docker-compose.ci.yml down -v
-          rm -f docker-compose.ci.yml
+          docker compose down -v
           echo "Cleanup complete"
