@@ -29,10 +29,10 @@ jobs:
           echo "Checking Docker Compose version..."
           docker compose version
 
-      - name: 5. Start all services with CI config
+      - name: 5. Start all services
         run: |
           echo "Starting services..."
-          docker compose -f docker-compose.yml -f docker-compose.ci.yml up --build -d
+          docker compose up --build -d
           echo "Services started"
 
       - name: 6. Wait for services to become healthy
@@ -84,6 +84,5 @@ jobs:
         if: always()
         run: |
           echo "Cleaning up..."
-          docker compose -f docker-compose.yml -f docker-compose.ci.yml down -v
-          rm -f docker-compose.ci.yml
+          docker compose down -v
           echo "Cleanup complete"
