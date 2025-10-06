@@ -16,7 +16,7 @@ dbt_project/run/
 *.msgpack
 *.json
 *.gpickle
-*.sql
+#*.sql
 
 # =========================================
 # 🪶 Airflow temporary and log files
