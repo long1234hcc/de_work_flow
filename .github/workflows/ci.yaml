@@ -29,43 +29,6 @@ jobs:
           echo "Checking Docker Compose version..."
           docker compose version
 
-      - name: 3. Create docker-compose.ci.yml override
-        run: |
-          echo "Creating CI docker-compose override..."
-          cat > docker-compose.ci.yml << 'EOF'
-          services:
-            airflow-init:
-              build:
-                context: ./airflow
-                args:
-                  AIRFLOW_UID: 50000
-                  AIRFLOW_GID: 0
-
-            airflow-webserver:
-              build:
-                context: ./airflow
-                args:
-                  AIRFLOW_UID: 50000
-                  AIRFLOW_GID: 0
-
-            airflow-scheduler:
-              build:
-                context: ./airflow
-                args:
-                  AIRFLOW_UID: 50000
-                  AIRFLOW_GID: 0
-          EOF
-          
-          echo "CI docker-compose override created"
-
-      - name: 4. Fix permissions for dbt directories
-        run: |
-          echo "Setting up permissions..."
-          mkdir -p dbt_project/logs dbt_project/target
-          sudo chown -R 50000:0 dbt_project/
-          sudo chmod -R 775 dbt_project/
-          ls -la dbt_project/
-
       - name: 5. Start all services with CI config
         run: |
           echo "Starting services..."
